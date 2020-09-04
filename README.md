@@ -1,4 +1,3 @@
-# Luna Licenses
+# Luna Press Start
 ### Author LunaTechs - Kino
-> A Plugin that lets you add licensing information to your title screen via a new scene.
-> For MV/MZ
+> A Plugin that allows you to display press start button before entering into your game's title title menu.
