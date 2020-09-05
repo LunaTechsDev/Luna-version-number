@@ -1,41 +1,12 @@
 /*:
 @author LunaTechs - Kino
-@plugindesc Allows you to display press start button before entering into your game's title 
-menu <LunaPressStart>.
+@plugindesc This plugin allows you to add sounds to your text in the message window
+at character, word, sentence, and just message intervals. 
+menu <LunaMsgSounds>.
 
 @target MV MZ
 
- @param Start Text
-* @desc Text to display in the press start window.
-* @default Press Start
-*
-* @param Font Size
-* @desc Size of the start text font.
-* @default 24
-*
-* @param Fade Enable
-* @desc Disable/Enable 'fade' (T/F).
-* @default T
-*
-* @param Fade Speed
-* @desc The speed at which to fade the text.
-* @default 1
-*
-* @param Window Width
-* @desc width of the window.
-* @default 200
-*
-* @param Window Height
-* @desc height of the window.
-* @default 75
-*
-* @param Window X Position
-* @desc The x position of the window on the title scene.
-* @default 308
-*
-* @param Window Y Position 
-* @desc The y position of the window on the title scene.
-* @default 312
+
 
 @help
 This plugin allows you to have a press start button before the title screen information.
