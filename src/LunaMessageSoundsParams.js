@@ -6,6 +6,9 @@ menu <LunaMsgSounds>.
 
 @target MV MZ
 
+@param audioBytes
+@desc The audio files to use when playing sound
+@type struct<SoundFile>[]
 
 
 @help
@@ -28,4 +31,35 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE
+*/
+
+/*~struct~SoundFile:
+* @param id
+* @text Identifier
+* @desc The identifier used in the text window
+* @type text
+*
+* @param name
+* @text Name
+* @desc The name of the audio SE file
+* @type file
+*
+* @param pitch
+* @text Pitch
+* @desc The pitch of the audio file
+* @type number
+* @default 100
+*
+* @param volume
+* @text Volume
+* @desc The volume of the audio file
+* @type number
+* @default 50
+*
+* @param pan
+* @text Pan
+* @desc The pan of the audio file
+* @type number
+* @default 100
+*
 */

@@ -2,7 +2,7 @@
 // Luna_MessageSounds.js
 //=============================================================================
 //=============================================================================
-// Build Date: 2020-09-07 22:57:20
+// Build Date: 2020-09-08 21:12:15
 //=============================================================================
 //=============================================================================
 // Made with LunaTea -- Haxe
@@ -92,6 +92,15 @@ class LunaMessageSounds {
 //=============================================================================
       
 		Window_Message = LTWinMsg
+		LunaMessageSounds.setupEvents()
+	}
+	static updateSoundState(state) {
+		LunaMessageSounds.currentSoundState = state
+	}
+	static setupEvents() {
+		LunaMessageSounds.messageEmitter.on("updateMode",function(state) {
+			LunaMessageSounds.updateSoundState(state)
+		})
 	}
 }
 LunaMessageSounds.__name__ = true
@@ -106,7 +115,28 @@ class LTWinMsg extends Window_Message {
 		super.processCharacter(textState)
 		let se = { name : "Cat", volume : 25, pitch : 100, pan : 0}
 		AudioManager.playTalkSe(se)
-		console.log("src/LunaMessageSounds.hx:75:","Playing SE")
+		console.log("src/LunaMessageSounds.hx:112:","Playing SE")
+	}
+	processSound(code,soundId) {
+		LunaMessageSounds.messageEmitter.emit("updateMode",{ id : soundId, mode : code})
+	}
+	processEscapeCharacter(code,textState) {
+		switch(code) {
+		case "LL":
+			this.processSound("letter",this.obtainEscapeParam(textState))
+			break
+		case "LS":
+			this.processSound("sentence",this.obtainEscapeParam(textState))
+			break
+		case "LT:":
+			this.processSound("text",this.obtainEscapeParam(textState))
+			break
+		case "LW":
+			this.processSound("word",this.obtainEscapeParam(textState))
+			break
+		default:
+			super.processEscapeCharacter(code,textState)
+		}
 	}
 }
 LTWinMsg.__name__ = true
@@ -237,5 +267,7 @@ utils_Fn.__name__ = true
 String.__name__ = true
 Array.__name__ = true
 js_Boot.__toStr = ({ }).toString
+LunaMessageSounds.currentSoundState = { id : "0", soundMode : "letter"}
+LunaMessageSounds.messageEmitter = new PIXI.utils.EventEmitter()
 LunaMessageSounds.main()
 })(typeof exports != "undefined" ? exports : typeof window != "undefined" ? window : typeof self != "undefined" ? self : this, {})
