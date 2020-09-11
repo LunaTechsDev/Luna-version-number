@@ -1,3 +1,3 @@
-# Luna Press Start
+# Luna Chatter
 ### Author LunaTechs - Kino
-> A Plugin that allows you to display press start button before entering into your game's title title menu.
+> A plugin that allows you to create notification windows and create event labels for all your events.
