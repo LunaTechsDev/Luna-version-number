@@ -1,5 +1,5 @@
 //=============================================================================
-// Luna_Chatter.js
+// Luna_ChatterMV.js
 //=============================================================================
 //=============================================================================
 // Build Date: 2020-09-12 19:34:01
@@ -249,7 +249,7 @@ class ChatterExtensions {
 ChatterExtensions.__name__ = true
 class ChatterWindow extends Window_Base {
 	constructor(x,y,width,height) {
-		super(new Rectangle(x,y,width,height))
+		super(x,y,width,height)
 	}
 	setupEvents(fn) {
 		fn(this)

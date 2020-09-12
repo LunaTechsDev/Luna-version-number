@@ -1,14 +1,32 @@
 /*:
 @author LunaTechs - Kino
-@plugindesc This plugin allows you to add sounds to your text in the message window
-at character, word, sentence, and just message intervals. 
-menu <LunaMsgSounds>.
+@plugindesc This plugin allows you to create notifications and event labels within RPGMakerMV/MZ <LunaChatter>.
 
 @target MV MZ
 
 @param audioBytes
 @desc The audio files to use when playing sound
 @type struct<SoundFile>[]
+
+@param fadeInTime
+@text Fade In Time
+@desc The time in frames to fade in the chatter window as it enters the screen.
+@default 120
+
+@param fadeOutTime
+@text Fade Out Time
+@desc The time in frames to fade out the chatter window as it leaves the screen.
+@default 120
+
+@param eventWindowRange
+@text Event Window Range
+@desc The radius in pixels in which the player will see the chatter window.
+@default 120
+
+@param anchorPosition
+@text Anchor Position
+@desc The anchor position of the chatter notification windows on the screen.
+@default right
 
 
 @help
@@ -31,6 +49,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE
+*/
+
+/*~struct~Template:
+*
+* @param id
+* @text Identifier
+* @desc The identifier used for this template
+* @default default
+*
 */
 
 /*~struct~SoundFile:
