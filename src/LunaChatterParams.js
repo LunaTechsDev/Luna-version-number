@@ -38,6 +38,18 @@
 @desc The background type of the event chatter windows. 
 @default 2
 
+@param templateStrings
+@text Template Strings
+@desc The template strings that you can draw within the
+text window.
+@type struct<Template>[]
+
+@param templateJSStrings
+@text Template JavaScript Strings
+@desc The template JavaScripts you can embed within
+the chatter window.
+@type struct<JSTemplate>[]
+
 
 @help
 This plugin allows you to have a press start button before the title screen information.
@@ -65,9 +77,28 @@ SOFTWARE
 *
 * @param id
 * @text Identifier
-* @desc The identifier used for this template
-* @default default
+* @desc The identifier used for this text template.
+* @default 1
 *
+* @param text
+* @text Text
+* @type note
+* @desc The text for the string template; has text code support.
+* @default \N[1]: Hello Tim
+*
+*/
+
+/*~struct~JSTemplate:
+* @param id
+* @text Identifier
+* @desc The identifier used for the JS template.
+* @default 1
+*
+* @param code
+* @text Code
+* @type note
+* @desc The code for the code template.
+* @default `${$gameActors.actor(1).name}`;
 */
 
 /*~struct~SoundFile:

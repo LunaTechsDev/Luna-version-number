@@ -1,3 +1,5 @@
+import rm.core.JsonEx;
+import haxe.crypto.BaseCode;
 import rm.sprites.Sprite_Character;
 import rm.core.TouchInput;
 import rm.objects.Game_Event;
@@ -16,6 +18,7 @@ import core.Types.JsFn;
 import utils.Fn;
 import rm.core.Rectangle;
 import rm.Globals;
+import utils.Parse;
 
 using LunaChatter.ChatterExtensions;
 using Lambda;
@@ -26,7 +29,17 @@ using core.NumberExtensions;
  * Chatter Template for creating custom chatter windows.
  */
 typedef ChatterTemplate = {
- var id: String;
+ var id: Int;
+}
+
+typedef TemplateString = {
+ > ChatterTemplate,
+ var text: String;
+}
+
+typedef JSTemplate = {
+ > ChatterTemplate,
+ var code: String;
 }
 
 typedef CHParams = {
@@ -36,6 +49,8 @@ typedef CHParams = {
  var anchorPosition: AnchorPos;
  var backgroundType: Int;
  var eventBackgroundType: Int;
+ var templateStrings: Array<TemplateString>;
+ var templateJSStrings: Array<JSTemplate>;
 };
 
 enum abstract ChatterEvents(String) from String to String {
@@ -84,8 +99,16 @@ class LunaChatter {
    eventWindowRange: Fn.parseIntJs(params["eventWindowRange"]),
    anchorPosition: params["anchorPosition"].trim(),
    backgroundType: Fn.parseIntJs(params["backgroundType"]),
-   eventBackgroundType: Fn.parseIntJs(params["eventbackgroundType"])
+   eventBackgroundType: Fn.parseIntJs(params["eventBackgroundType"]),
+   templateStrings: JsonEx.parse(params["templateStrings"]),
+   templateJSStrings: JsonEx.parse(params["templateJSStrings"])
   }
+
+  CHParams.templateJSStrings = cast CHParams.templateJSStrings.map((ts) ->
+   JsonEx.parse(cast ts));
+  CHParams.templateStrings = cast CHParams.templateStrings.map((ts) ->
+   JsonEx.parse(cast ts));
+  trace(CHParams);
 
   Comment.title("Event Hooks");
   setupEvents();
@@ -111,6 +134,60 @@ class LunaChatter {
   ChatterEmitter.on(ChatterEvents.DEQUEUE, () -> {
    dequeueChatterWindow();
   });
+
+  Comment.title("Window_Base");
+  var _WindowBaseEscapeCharacter: JsFn = Fn.proto(Window_Base)
+   .processEscapeCharacterR;
+  Fn.proto(Window_Base)
+   .processEscapeCharacterD = (code: String, textState: TextState) -> {
+    var winBase: Window_Base = Fn.self;
+    switch (code) {
+     case "LCT":
+      processTemplateString(winBase,
+       cast winBase.obtainEscapeParam(textState), textState);
+     case "LCJS":
+      processJSTemplateString(winBase,
+       cast winBase.obtainEscapeParam(textState), textState);
+     case _:
+      _WindowBaseEscapeCharacter.call(Fn.self, code, textState);
+    }
+   };
+
+  //    var _WinBaseEscapeParam :JsFn = Fn.proto(Window_Base).obtainEscapeParamR;
+  //    Fn.proto(Window_Base).obtainEscapeParamD = (textState) -> {
+  //      final stringReg = ~/^\[.*?\]/ig;
+  //      if(stringReg.match(textState.text)) {
+  //        return
+  //      } else {
+  //        return
+  //      }
+  //    };
+ }
+
+ public static function processTemplateString(win: Window_Base,
+   templateIndex: Int, textState: TextState) {
+  var templateStr: TemplateString = LunaChatter.CHParams.templateStrings.find((ts) ->
+   ts.id == templateIndex);
+  var text = templateStr.text;
+  #if compileMV
+  win.drawTextEx(text, textState.x, textState.y);
+  #else
+  win.drawTextEx(text, textState.x, textState.y, win.contentsWidth());
+  #end
+ }
+
+ public static function processJSTemplateString(win: Window_Base,
+   templateIndex: Int, textState: TextState) {
+  var templateJsStr: JSTemplate = LunaChatter.CHParams.templateJSStrings.find((ts: Dynamic) ->
+   ts.id == templateIndex);
+  var code = templateJsStr.code;
+  var text = js.Syntax.code("new Function({0})()", code);
+  trace(templateJsStr);
+  #if compileMV
+  win.drawTextEx(text, textState.x, textState.x);
+  #else
+  win.drawTextEx(text, textState.x, textState.y, win.contentsWidth());
+  #end
  }
 
  public static function createAllEventWindows(scene: Scene_Map) {

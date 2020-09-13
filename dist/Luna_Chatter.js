@@ -2,7 +2,7 @@
 // Luna_Chatter.js
 //=============================================================================
 //=============================================================================
-// Build Date: 2020-09-12 20:03:22
+// Build Date: 2020-09-13 00:24:28
 //=============================================================================
 //=============================================================================
 // Made with LunaTea -- Haxe
@@ -50,6 +50,18 @@
 @desc The background type of the event chatter windows. 
 @default 2
 
+@param templateStrings
+@text Template Strings
+@desc The template strings that you can draw within the
+text window.
+@type struct<Template>[]
+
+@param templateJSStrings
+@text Template JavaScript Strings
+@desc The template JavaScripts you can embed within
+the chatter window.
+@type struct<JSTemplate>[]
+
 
 @help
 This plugin allows you to have a press start button before the title screen information.
@@ -77,9 +89,28 @@ SOFTWARE
 *
 * @param id
 * @text Identifier
-* @desc The identifier used for this template
-* @default default
+* @desc The identifier used for this text template.
+* @default 1
 *
+* @param text
+* @text Text
+* @type note
+* @desc The text for the string template has text code support.
+* @default \N[1]: Hello Tim
+*
+*/
+
+/*~struct~JSTemplate:
+* @param id
+* @text Identifier
+* @desc The identifier used for the JS template.
+* @default 1
+*
+* @param code
+* @text Code
+* @type note
+* @desc The code for the code template.
+* @default `${$gameActors.actor(1).name}`
 */
 
 /*~struct~SoundFile:
@@ -133,6 +164,16 @@ class Lambda {
 		let x = $getIterator(it)
 		while(x.hasNext()) f(x.next())
 	}
+	static find(it,f) {
+		let v = $getIterator(it)
+		while(v.hasNext()) {
+			let v1 = v.next()
+			if(f(v1)) {
+				return v1;
+			}
+		}
+		return null;
+	}
 }
 Lambda.__name__ = true
 class _$LTGlobals_$ {
@@ -154,8 +195,27 @@ class LunaChatter {
 		let tmp3 = LunaChatter.params["anchorPosition"].trim()
 		let string3 = LunaChatter.params["backgroundType"]
 		let tmp4 = parseInt(string3,10)
-		let string4 = LunaChatter.params["eventbackgroundType"]
-		LunaChatter.CHParams = { fadeInTime : tmp, fadeOutTime : tmp1, eventWindowRange : tmp2, anchorPosition : tmp3, backgroundType : tmp4, eventBackgroundType : parseInt(string4,10)}
+		let string4 = LunaChatter.params["eventBackgroundType"]
+		LunaChatter.CHParams = { fadeInTime : tmp, fadeOutTime : tmp1, eventWindowRange : tmp2, anchorPosition : tmp3, backgroundType : tmp4, eventBackgroundType : parseInt(string4,10), templateStrings : JsonEx.parse(LunaChatter.params["templateStrings"]), templateJSStrings : JsonEx.parse(LunaChatter.params["templateJSStrings"])}
+		let _this = LunaChatter.CHParams.templateJSStrings
+		let result = new Array(_this.length)
+		let _g = 0
+		let _g1 = _this.length
+		while(_g < _g1) {
+			let i = _g++
+			result[i] = JsonEx.parse(_this[i])
+		}
+		LunaChatter.CHParams.templateJSStrings = result
+		let _this1 = LunaChatter.CHParams.templateStrings
+		let result1 = new Array(_this1.length)
+		let _g2 = 0
+		let _g11 = _this1.length
+		while(_g2 < _g11) {
+			let i = _g2++
+			result1[i] = JsonEx.parse(_this1[i])
+		}
+		LunaChatter.CHParams.templateStrings = result1
+		console.log("src/LunaChatter.hx:111:",LunaChatter.CHParams)
 		
 //=============================================================================
 // Event Hooks
@@ -184,6 +244,38 @@ class LunaChatter {
 		LunaChatter.ChatterEmitter.on("dequeue",function() {
 			LunaChatter.dequeueChatterWindow()
 		})
+		
+//=============================================================================
+// Window_Base
+//=============================================================================
+      
+		let _WindowBaseEscapeCharacter = Window_Base.prototype.processEscapeCharacter
+		Window_Base.prototype.processEscapeCharacter = function(code,textState) {
+			let winBase = this
+			switch(code) {
+			case "LCJS":
+				LunaChatter.processJSTemplateString(winBase,winBase.obtainEscapeParam(textState),textState)
+				break
+			case "LCT":
+				LunaChatter.processTemplateString(winBase,winBase.obtainEscapeParam(textState),textState)
+				break
+			default:
+				_WindowBaseEscapeCharacter.call(this,code,textState)
+			}
+		}
+	}
+	static processTemplateString(win,templateIndex,textState) {
+		win.drawTextEx(Lambda.find(LunaChatter.CHParams.templateStrings,function(ts) {
+			return ts.id == templateIndex;
+		}).text,textState.x,textState.y,win.contentsWidth())
+	}
+	static processJSTemplateString(win,templateIndex,textState) {
+		let templateJsStr = Lambda.find(LunaChatter.CHParams.templateJSStrings,function(ts) {
+			return ts.id == templateIndex;
+		})
+		let text = new Function(templateJsStr.code)()
+		console.log("src/LunaChatter.hx:185:",templateJsStr)
+		win.drawTextEx(text,textState.x,textState.y,win.contentsWidth())
 	}
 	static createAllEventWindows(scene) {
 		Lambda.iter($gameMap.events(),function(event) {
