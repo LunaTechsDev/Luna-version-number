@@ -28,6 +28,16 @@
 @desc The anchor position of the chatter notification windows on the screen.
 @default right
 
+@param backgroundType
+@text Background Type
+@desc The background type of the chatter windows.
+@default 0
+
+@param eventBackgroundType
+@text Event Background Type
+@desc The background type of the event chatter windows. 
+@default 2
+
 
 @help
 This plugin allows you to have a press start button before the title screen information.

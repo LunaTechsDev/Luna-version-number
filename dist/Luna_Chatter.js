@@ -2,7 +2,7 @@
 // Luna_Chatter.js
 //=============================================================================
 //=============================================================================
-// Build Date: 2020-09-12 19:34:01
+// Build Date: 2020-09-12 20:03:22
 //=============================================================================
 //=============================================================================
 // Made with LunaTea -- Haxe
@@ -39,6 +39,16 @@
 @text Anchor Position
 @desc The anchor position of the chatter notification windows on the screen.
 @default right
+
+@param backgroundType
+@text Background Type
+@desc The background type of the chatter windows.
+@default 0
+
+@param eventBackgroundType
+@text Event Background Type
+@desc The background type of the event chatter windows. 
+@default 2
 
 
 @help
@@ -136,12 +146,16 @@ class LunaChatter {
 //=============================================================================
       
 		let string = LunaChatter.params["fadeInTime"]
-		LunaChatter.fadeInTime = parseInt(string,10)
+		let tmp = parseInt(string,10)
 		let string1 = LunaChatter.params["fadeOutTime"]
-		LunaChatter.fadeOutTime = parseInt(string1,10)
+		let tmp1 = parseInt(string1,10)
 		let string2 = LunaChatter.params["eventWindowRange"]
-		LunaChatter.eventWindowRange = parseInt(string2,10)
-		LunaChatter.anchorPosition = LunaChatter.params["anchorPosition"].trim()
+		let tmp2 = parseInt(string2,10)
+		let tmp3 = LunaChatter.params["anchorPosition"].trim()
+		let string3 = LunaChatter.params["backgroundType"]
+		let tmp4 = parseInt(string3,10)
+		let string4 = LunaChatter.params["eventbackgroundType"]
+		LunaChatter.CHParams = { fadeInTime : tmp, fadeOutTime : tmp1, eventWindowRange : tmp2, anchorPosition : tmp3, backgroundType : tmp4, eventBackgroundType : parseInt(string4,10)}
 		
 //=============================================================================
 // Event Hooks
@@ -214,6 +228,9 @@ class LunaChatter {
 				win.hovered = false
 			}
 		})
+		currentWindow.on("paint",function(win) {
+			win.drawText(win.event.event().name,0,0,win.contentsWidth(),"center")
+		})
 	}
 	static queueChatterWindow(win) {
 		ChatterExtensions.enqueue(LunaChatter.chatterQueue,win)
@@ -250,9 +267,19 @@ ChatterExtensions.__name__ = true
 class ChatterWindow extends Window_Base {
 	constructor(x,y,width,height) {
 		super(new Rectangle(x,y,width,height))
+		this.setBGType()
+	}
+	setBGType() {
+		this.setBackgroundType(LunaChatter.CHParams.backgroundType)
 	}
 	setupEvents(fn) {
 		fn(this)
+	}
+	paint() {
+		if(this.contents != null) {
+			this.contents.clear()
+			this.emit("paint",this)
+		}
 	}
 	show() {
 		this.emit("show",this)
@@ -278,6 +305,9 @@ class ChatterEventWindow extends ChatterWindow {
 		this.hovered = false
 		this.playerInRange = false
 	}
+	setBGType() {
+		this.setBackgroundType(LunaChatter.CHParams.eventBackgroundType)
+	}
 	setEvent(evt) {
 		this.event = evt
 	}
@@ -288,13 +318,14 @@ class ChatterEventWindow extends ChatterWindow {
 		super.update()
 		this.scanForPlayer()
 		this.scanForHover()
+		this.paint()
 	}
 	scanForPlayer() {
 		let eventX = this.event.screenX()
 		let eventY = this.event.screenY()
 		let playerX = $gamePlayer.screenX()
 		let playerY = $gamePlayer.screenY()
-		if(Math.sqrt(Math.pow(playerX - eventX,2) + Math.pow(playerY - eventY,2)) < LunaChatter.eventWindowRange) {
+		if(Math.sqrt(Math.pow(playerX - eventX,2) + Math.pow(playerY - eventY,2)) < LunaChatter.CHParams.eventWindowRange) {
 			this.emit("playerInRange",this)
 		} else {
 			this.emit("playerOutOfRange",this)
@@ -439,10 +470,6 @@ String.__name__ = true
 Array.__name__ = true
 js_Boot.__toStr = ({ }).toString
 LunaChatter.ChatterEmitter = new PIXI.utils.EventEmitter()
-LunaChatter.fadeInTime = 0
-LunaChatter.fadeOutTime = 0
-LunaChatter.eventWindowRange = 0
-LunaChatter.anchorPosition = "bottomRight"
 LunaChatter.params = (function($this) {
 	var $r
 	let _this = $plugins

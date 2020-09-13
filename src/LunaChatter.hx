@@ -29,6 +29,15 @@ typedef ChatterTemplate = {
  var id: String;
 }
 
+typedef CHParams = {
+ var fadeInTime: Int;
+ var fadeOutTime: Int;
+ var eventWindowRange: Int;
+ var anchorPosition: AnchorPos;
+ var backgroundType: Int;
+ var eventBackgroundType: Int;
+};
+
 enum abstract ChatterEvents(String) from String to String {
  public var SHOW = "show";
  public var PUSH = "push";
@@ -36,6 +45,7 @@ enum abstract ChatterEvents(String) from String to String {
  public var CLOSE = "close";
  public var OPEN = "open";
  public var QUEUE = "queue";
+ public var PAINT = "paint";
  public var DEQUEUE = "dequeue";
  public var PLAYERINRANGE = "playerInRange";
  public var PLAYEROUTOFRANGE = "playerOutOfRange";
@@ -60,10 +70,7 @@ enum abstract AnchorPos(String) from String to String {
 
 class LunaChatter {
  public static var ChatterEmitter = Amaryllis.createEventEmitter();
- public static var fadeInTime = 0;
- public static var fadeOutTime = 0;
- public static var eventWindowRange = 0;
- public static var anchorPosition: AnchorPos = AnchorPos.BOTTOMRIGHT;
+ public static var CHParams: CHParams;
  public static var params = Globals.Plugins.filter((plugin) ->
   ~/<LunaChatter>/ig.match(plugin.description))[0].parameters;
  public static var chatterQueue: Array<ChatterWindow> = [];
@@ -71,10 +78,14 @@ class LunaChatter {
 
  public static function main() {
   Comment.title("Parameter Setup");
-  fadeInTime = Fn.parseIntJs(params["fadeInTime"]);
-  fadeOutTime = Fn.parseIntJs(params["fadeOutTime"]);
-  eventWindowRange = Fn.parseIntJs(params["eventWindowRange"]);
-  anchorPosition = params["anchorPosition"].trim();
+  CHParams = {
+   fadeInTime: Fn.parseIntJs(params["fadeInTime"]),
+   fadeOutTime: Fn.parseIntJs(params["fadeOutTime"]),
+   eventWindowRange: Fn.parseIntJs(params["eventWindowRange"]),
+   anchorPosition: params["anchorPosition"].trim(),
+   backgroundType: Fn.parseIntJs(params["backgroundType"]),
+   eventBackgroundType: Fn.parseIntJs(params["eventbackgroundType"])
+  }
 
   Comment.title("Event Hooks");
   setupEvents();
@@ -120,7 +131,6 @@ class LunaChatter {
      chatterEventWindow.close();
     }
    });
-   //  scene.addWindow(chatterEventWindow);
 
    chatterEventWindow.setupEvents(cast setupGameEvtEvents);
    chatterEventWindow.open();
@@ -155,6 +165,10 @@ class LunaChatter {
     closeChatterWindow(win);
     win.hovered = false;
    }
+  });
+
+  currentWindow.on(ChatterEvents.PAINT, (win: ChatterEventWindow) -> {
+   win.drawText(win.event.event().name, 0, 0, win.contentsWidth(), "center");
   });
  }
 
@@ -224,14 +238,22 @@ class ChatterWindow extends Window_Base {
   var rect = new Rectangle(x, y, width, height);
   super(rect);
   #end
+  this.setBGType();
+ }
+
+ public function setBGType() {
+  this.setBackgroundType(LunaChatter.CHParams.backgroundType);
  }
 
  public function setupEvents(fn: (win: ChatterWindow) -> Void) {
   fn(this);
  }
 
- public function paint(fn: (win: ChatterWindow) -> Void) {
-  fn(this);
+ public function paint() {
+  if (this.contents != null) {
+   this.contents.clear();
+   this.emit(ChatterEvents.PAINT, this);
+  }
  }
 
  public override function show() {
@@ -267,6 +289,10 @@ class ChatterEventWindow extends ChatterWindow {
   this.playerInRange = false;
  }
 
+ public override function setBGType() {
+  this.setBackgroundType(LunaChatter.CHParams.eventBackgroundType);
+ }
+
  public function setEvent(evt: Game_Event) {
   this.event = evt;
  }
@@ -279,6 +305,7 @@ class ChatterEventWindow extends ChatterWindow {
   super.update();
   this.scanForPlayer();
   this.scanForHover();
+  this.paint();
  }
 
  public function scanForPlayer() {
@@ -288,7 +315,7 @@ class ChatterEventWindow extends ChatterWindow {
   var playerY = Globals.GamePlayer.screenY();
 
   var inRange = Math.sqrt(Math.pow(playerX - eventX, 2)
-   + Math.pow(playerY - eventY, 2)) < LunaChatter.eventWindowRange;
+   + Math.pow(playerY - eventY, 2)) < LunaChatter.CHParams.eventWindowRange;
 
   if (inRange) {
    this.emit(ChatterEvents.PLAYERINRANGE, this);
