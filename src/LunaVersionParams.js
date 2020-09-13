@@ -1,19 +1,46 @@
 /*:
 @author LunaTechs - Kino
-@plugindesc Adds additional fonts to your RPGMakerMV/MZ 
-that any plugin developer can use when working on your game <LunaFonts>.
+@plugindesc A plugin that displays the current build version of your
+project on the title screen <LunaVersion>.
 
 @target MV MZ
 
-@param fonts
-@text Fonts 
-@desc The list of fonts that you want added to your RPGMakerMV game.
-text window.
-@type struct<Font>[]
+@param x
+@text X Position
+@desc The X position of the version number window.
+@default 0
+
+@param y
+@text Y Position
+@desc The Y position of the version number window.
+@default 540
+
+@param width
+@text Width
+@desc The width of the version number window.
+@default 100
+
+@param height
+@text Height
+@desc The height of the version number window
+@default 75
+
+@param fontSize
+@text Font Size
+@desc The font size of the version number window
+@default 24
+
+@param fontFace
+@text Font Face
+@desc The font face of the version number window optional parameter(requires Luna-More-Fonts);
+
+@param versionText
+@text Version Text
+@desc The version text 
 
 @help
-This plugin allows you to add additional fonts to your RPGMakerMV/MZ game
-for any other plugin to use.
+A plugin that displays the current build version of your
+project on the title screen.
 
 
 MIT License
@@ -35,17 +62,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE
 */
 
-/*~struct~Font:
-*
-* @param fontName
-* @text Font Name
-* @desc The name of the font within RPGMaker.
-* @default rmmv-font3
-*
-* @param fontFileName
-* @text Font File Name
-* @desc The name of the file name of the font, including extension(.ttf);
-* @default rm-font.tff
-*
-*/
 
