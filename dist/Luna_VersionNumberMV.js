@@ -2,7 +2,7 @@
 // Luna_VersionNumberMV.js
 //=============================================================================
 //=============================================================================
-// Build Date: 2020-09-13 18:51:24
+// Build Date: 2020-10-24 20:27:04
 //=============================================================================
 //=============================================================================
 // Made with LunaTea -- Haxe
@@ -362,7 +362,7 @@ class FontManager {
 		throw haxe_Exception.thrown(["LoadError",url,retry])
 	}
 	static makeUrl(fileName) {
-		return "fonts/" + Std.string(encodeURIComponent(fileName).replace(/%2F/g, "/"););
+		return "fonts/" + Std.string(encodeURIComponent(fileName).replace(/%2F/g, "/"));
 	}
 	static load(family,filename) {
 		if(FontManager._states[family] != "loaded") {
@@ -411,7 +411,7 @@ class FontManager {
 		throw haxe_Exception.thrown(["LoadError",url,retry])
 	}
 	static makeUrl(fileName) {
-		return "fonts/" + Std.string(encodeURIComponent(fileName).replace(/%2F/g, "/"););
+		return "fonts/" + Std.string(encodeURIComponent(fileName).replace(/%2F/g, "/"));
 	}
 }
 $hx_exports["FontManager"] = FontManager
